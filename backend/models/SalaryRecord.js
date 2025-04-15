@@ -5,60 +5,84 @@ const salaryRecordSchema = new mongoose.Schema({
   employee: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Employee',
-    required: true,
+    required: true
   },
-  // For instance, store the month as a string (e.g., "2025-02" or "Feb 2025")
   month: {
-    type: String,
-    required: true,
+    type: Number, // 0-11 (January-December)
+    required: true
+  },
+  year: {
+    type: Number,
+    required: true
+  },
+  totalWorkingDays: {
+    type: Number,
+    required: true
+  },
+  daysWorked: {
+    type: Number,
+    required: true
+  },
+  regularHours: {
+    type: Number,
+    default: 0
   },
   overtimeHours: {
     type: Number,
-    default: 0,
+    default: 0
   },
-  debitAmount: {
+  grossSalary: {
     type: Number,
-    default: 0,
+    required: true
   },
-  creditAmount: {
-    type: Number,
-    default: 0,
+  deductions: {
+    advances: {
+      type: Number,
+      default: 0
+    },
+    loans: {
+      type: Number,
+      default: 0
+    },
+    other: {
+      type: Number,
+      default: 0
+    }
   },
-  // The total salary could be the sum of various components
-  totalSalary: {
-    type: Number,
-    default: 0,
-  },
-  // Loan or other deductions
-  loan: {
-    type: Number,
-    default: 0,
-  },
-  // Advances taken by the employee
-  advance: {
-    type: Number,
-    default: 0,
-  },
-  // Net salary is the final amount after adjustments
   netSalary: {
     type: Number,
-    default: 0,
+    required: true
   },
-  // Timestamp for when the record is created or updated
-  createdAt: {
+  isPaid: {
+    type: Boolean,
+    default: false
+  },
+  paymentDate: {
     type: Date,
-    default: Date.now,
+    default: null
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
+  paymentMethod: {
+    type: String,
+    enum: ['cash', 'bank_transfer', 'check', 'other'],
+    default: 'cash'
   },
+  notes: String,
+  business: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // References the owner's User document
+    required: true
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+}, {
+  timestamps: true
 });
 
-// Update the updatedAt field on every save
-salaryRecordSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
+// Compound index for faster queries and to prevent duplicate salary records
+salaryRecordSchema.index({ employee: 1, month: 1, year: 1 }, { unique: true });
+salaryRecordSchema.index({ business: 1, month: 1, year: 1 }); // For monthly reports
 
 module.exports = mongoose.model('SalaryRecord', salaryRecordSchema);
