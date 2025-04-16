@@ -10,9 +10,12 @@ const { auth, ownerAuth } = require('../middleware/auth');
 // @route   GET /api/auth/google
 // @desc    Auth with Google
 // @access  Public
-router.get('/google', 
-  passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+router.get('/google', (req, res, next) => {
+  console.log('Google OAuth route accessed');
+  console.log('Client ID:', process.env.GOOGLE_CLIENT_ID);
+  console.log('Callback URL:', process.env.GOOGLE_CALLBACK_URL);
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
 
 // @route   GET /api/auth/google/callback
 // @desc    Google auth callback
@@ -27,6 +30,12 @@ router.get('/google/callback',
 // @route   POST /api/auth/register
 // @desc    Register user
 // @access  Public
+
+
+router.get('/test-auth', (req, res) => {
+  console.log('Auth test route hit');
+  res.send('Auth routes are working properly');
+});
 router.post('/register', [
   check('username', 'Username is required').not().isEmpty(),
   check('email', 'Please include a valid email').isEmail(),
