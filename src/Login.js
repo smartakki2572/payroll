@@ -1,27 +1,20 @@
 import React, { useState } from 'react';
-import { 
-  Container, 
-  Box, 
-  Typography, 
-  TextField, 
-  Button, 
-  Paper, 
-  Grid,
-  Link,
-  Divider,
-  Alert
+import {
+  Container, Box, Typography, TextField, Button, Paper,
+  Grid, Link, Divider, Alert
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import GoogleIcon from '@mui/icons-material/Google';
 
 function Login() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: 'a@a.com',
+    password: 'abcd'
   });
   const [error, setError] = useState('');
   const { login, loading } = useAuth();
+  const navigate = useNavigate(); // 👈 Add this here
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -30,14 +23,16 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!formData.email || !formData.password) {
       setError('Please fill in all fields');
       return;
     }
-    
+
     const success = await login(formData.email, formData.password);
-    if (!success) {
+    if (success) {
+      navigate('/dashboard'); // 👈 Redirect on success
+    } else {
       setError('Invalid email or password');
     }
   };
@@ -58,11 +53,11 @@ function Login() {
           py: 8
         }}
       >
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 4, 
-            width: '100%', 
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            width: '100%',
             borderRadius: 2,
             boxShadow: '0px 3px 15px rgba(0, 0, 0, 0.05)'
           }}

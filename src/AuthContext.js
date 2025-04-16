@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useCallback,
+  useEffect
+} from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -24,11 +30,20 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Auto-check on mount
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
   // Login
   const login = async (email, password) => {
     try {
       setLoading(true);
-      const res = await axios.post('/api/auth/login', { email, password }, { withCredentials: true });
+      const res = await axios.post(
+        '/api/auth/login',
+        { email, password },
+        { withCredentials: true }
+      );
       setUser(res.data.user);
       setError(null);
       return true;
@@ -44,7 +59,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       setLoading(true);
-      const res = await axios.post('/api/auth/register', userData, { withCredentials: true });
+      const res = await axios.post('/api/auth/register', userData, {
+        withCredentials: true
+      });
       setUser(res.data.user);
       setError(null);
       return true;
